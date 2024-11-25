@@ -4,15 +4,11 @@ services:
     build: ./backend
     ports:
       - "8080:8080"
-    environment:
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=rootpassword
-      - DB_NAME=db_rides
-      - PORT=8080
+    env_file:
+      - .env  # Adiciona essa linha para que o Docker leia o .env da raiz
     depends_on:
       - db
-
+    
   db:
     image: mysql:8
     container_name: db_rides
@@ -21,8 +17,8 @@ services:
       MYSQL_DATABASE: db_rides
     ports:
       - "3306:3306"
+      
     volumes:
-
       - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   frontend:

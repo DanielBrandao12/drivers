@@ -8,7 +8,9 @@ import cors from 'cors';
 import userRouter from './routes/userRoute'; 
 import rideRouter from './routes/ridesRoute';
 
-dotenv.config();  // Carregar as variáveis de ambiente do arquivo .env
+
+dotenv.config({ path: './.env' }); 
+
 const app: Application = express();
 
 app.use(express.json());
