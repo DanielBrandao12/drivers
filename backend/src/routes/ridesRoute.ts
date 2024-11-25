@@ -6,4 +6,7 @@ import * as controller from '../controllers/ridesController';
 const router = Router();
 
 router.post('/estimate', controller.verifyRoute);
+
+router.patch('/confirm', controller.confirmRide);
+
 export default router;
