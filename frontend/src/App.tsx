@@ -2,8 +2,16 @@ import React, { useState } from 'react';
 import api from './services/api';
 
 interface ApiResponse {
-  // Defina a estrutura de resposta esperada, por exemplo:
-  message: string;
+  origin: {
+    latitude: number;
+    longitude: number;
+  };
+  destination: {
+    latitude: number;
+    longitude: number;
+  };
+  distance: number;
+  duration: string;
 }
 
 const App: React.FC = () => {
@@ -25,10 +33,13 @@ const App: React.FC = () => {
       const response = await api.post<ApiResponse>('/ride/estimate', { origin, destination });
 
       // Verifica se a resposta foi bem-sucedida
-      if (response.status === 200) {
-        setMessage(response.data.message || 'Rota calculada com sucesso!');
+      if (response.status === 200 && response.data) {
+        console.log('Resposta da API:', response.data);
+        setMessage( 'Rota calculada com sucesso!');
         setOrigin(''); // Limpar o campo após o envio
         setDestination(''); // Limpar o campo após o envio
+        
+      
       } else {
         setMessage('Ocorreu um erro ao calcular a rota.');
       }

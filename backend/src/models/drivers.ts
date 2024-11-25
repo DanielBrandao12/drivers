@@ -4,7 +4,7 @@ import { sequelize } from '../config/database';
 interface IDriverAttributes {
   id: number;
   m_name: string;
-  m_drescription: string;
+  m_description: string;
   vehicle: string;
   tax_km: number;
   km_min: number;
@@ -15,7 +15,7 @@ interface IDriverAttributes {
 class Driver extends Model<IDriverAttributes> implements IDriverAttributes {
   public id!: number;
   public m_name!: string;
-  public m_drescription!: string;
+  public m_description!: string;
   public vehicle!: string;
   public tax_km!: number;
   public km_min!: number;
@@ -33,7 +33,7 @@ Driver.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    m_drescription: {
+    m_description: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
