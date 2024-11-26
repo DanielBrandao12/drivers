@@ -17,6 +17,7 @@ interface ApiResponse {
   distance: number;
   duration: string;
   options: Array<{
+    id: number
     name: string;
     vehicle: string;
     description: string;
@@ -35,7 +36,7 @@ export const EstimateForm: React.FC = () => {
   }); // Mensagens de feedback
   const [drivers, setDrivers] = useState<any[]>([]);
   const [showModal, setShowModal] = useState<string>('');
-
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -62,7 +63,7 @@ export const EstimateForm: React.FC = () => {
         setShowModal('flex');
         setMessage({ text: 'Rota calculada com sucesso!', type: 'success' });
         setFormData({ id: '', origin: '', destination: '' }); // Limpa os campos do formulário
-        localStorage.setItem('mapUrl', response.data.mapUrl);
+         localStorage.setItem('mapUrl', response.data.mapUrl);
       } else {
         setMessage({ text: 'Ocorreu um erro ao calcular a rota.', type: 'error' });
       }
@@ -135,7 +136,6 @@ export const EstimateForm: React.FC = () => {
         onClose={() => setShowModal('none')}
         drivers={drivers}
       />
-      
     </div>
   );
 };

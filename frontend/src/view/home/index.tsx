@@ -10,7 +10,8 @@ import { Map } from '../../components/maps';
 
 export const Home: React.FC = () => {
   const [formData, setFormData] = useState({ id: '', origin: '', destination: '' });
- 
+
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });

@@ -91,7 +91,7 @@ export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Re
         const { id, origin, destination } = req.body;
 
         // Verificar se o usuário existe
-        const user = await getUser(id);  // A função getUser agora retorna o usuário ou undefined
+        const user = await getUser(id);
 
         if (!user) {
             res.status(404).json({ error: 'Usuário não encontrado.' });
@@ -153,18 +153,28 @@ export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Re
                 })
             );
 
+            // Criar o registro da corrida
+            const ride = await Ride.create({
+                origin,
+                destination,
+                distance,
+                duration,
+                user_id: id,
+            });
+
             // Gerar o URL do mapa estático
             const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers=color:red%7Clabel:S%7C${originCoords.latitude},${originCoords.longitude}&markers=color:blue%7Clabel:D%7C${destinationCoords.latitude},${destinationCoords.longitude}&path=color:0x0000ff|weight:3|${originCoords.latitude},${originCoords.longitude}|${destinationCoords.latitude},${destinationCoords.longitude}&key=${GOOGLE_MAPS_API_KEY}`;
 
-            // Responder com os dados processados
+            // Responder com os dados processados, incluindo o ID da corrida
             res.status(200).json({
+                rideId: ride.id, // ID da corrida
                 origin: originCoords,
                 destination: destinationCoords,
                 distance,
                 duration,
                 options,
-                routeResponse: route, // Incluindo a rota completa, caso necessário
-                mapUrl: staticMapUrl, // URL do mapa estático
+                routeResponse: route,
+                mapUrl: staticMapUrl,
             });
         } else {
             console.warn('Nenhuma rota encontrada na resposta da API.');
@@ -178,14 +188,13 @@ export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Re
 
 
 
-
 export const confirmRide = async (req: Request, res: Response): Promise<void> => {
     try {
         // Extrair os campos do corpo da requisição
-        const { user_id, origin, destination, distance, duration, driver_id, value } = req.body;
+        const { id,driver_id, value } = req.body;
 
         // Validação básica dos campos obrigatórios
-        if (!user_id || !origin || !destination || !distance || !duration || !driver_id || !value) {
+        if ( !driver_id || !value) {
             res.status(400).json({ 
                 error: 'Todos os campos obrigatórios devem ser fornecidos: user_id, origin, destination, distance, duration, driver_id, value.' 
             });
@@ -193,31 +202,17 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
         }
 
         // Criação do registro da corrida
-        const ride = await Ride.create({
-            origin,
-            destination,
-            distance,
-            duration,
-            user_id,
+        await Ride.update({
+       
             driver_id,
-            r_value: value,
-            r_date: new Date(), // Data/hora atual
-        });
+            r_value:value,
+            r_date:new Date()
+            
+        },{where:{id}});
 
         // Retornar a confirmação da criação com os dados da corrida
-        res.status(201).json({
-            message: 'Corrida confirmada com sucesso.',
-            ride: {
-                id: ride.id,
-                origin: ride.origin,
-                destination: ride.destination,
-                distance: ride.distance,
-                duration: ride.duration,
-                user_id: ride.user_id,
-                driver_id: ride.driver_id,
-                value: ride.r_value,
-                date: ride.r_date,
-            },
+        res.status(200).json({
+            message: 'Corrida confirmada com sucesso.'
         });
     } catch (error) {
         console.error('Erro ao confirmar a corrida:', error.message || error);

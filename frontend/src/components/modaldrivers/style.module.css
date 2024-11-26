@@ -4,11 +4,12 @@
     top: 0;
     left: 0;
     display: flex;
-    justify-content: flex-end;
+    flex-direction: row;
+    justify-content: space-around;
     align-items: center;
     width: 100vw;
     height: 100vh;
-   
+    background-color: rgba(30, 32, 68, 0.096);
     z-index: 999;
   }
   
