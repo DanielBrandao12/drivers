@@ -13,6 +13,9 @@ if (!dbName || !dbUser || !dbPassword || !dbHost) {
 const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
   host: dbHost,
   dialect: 'mysql',
+  dialectOptions: {
+    charset: 'utf8mb4',
+  },
 });
 
 export { sequelize };

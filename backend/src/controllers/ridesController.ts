@@ -153,6 +153,9 @@ export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Re
                 })
             );
 
+            // Gerar o URL do mapa estático
+            const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers=color:red%7Clabel:S%7C${originCoords.latitude},${originCoords.longitude}&markers=color:blue%7Clabel:D%7C${destinationCoords.latitude},${destinationCoords.longitude}&path=color:0x0000ff|weight:3|${originCoords.latitude},${originCoords.longitude}|${destinationCoords.latitude},${destinationCoords.longitude}&key=${GOOGLE_MAPS_API_KEY}`;
+
             // Responder com os dados processados
             res.status(200).json({
                 origin: originCoords,
@@ -161,6 +164,7 @@ export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Re
                 duration,
                 options,
                 routeResponse: route, // Incluindo a rota completa, caso necessário
+                mapUrl: staticMapUrl, // URL do mapa estático
             });
         } else {
             console.warn('Nenhuma rota encontrada na resposta da API.');
@@ -171,6 +175,7 @@ export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Re
         res.status(500).json({ error: 'Erro interno ao verificar a rota. Tente novamente mais tarde.' });
     }
 };
+
 
 
 

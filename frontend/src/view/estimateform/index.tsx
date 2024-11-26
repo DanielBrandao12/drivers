@@ -23,6 +23,7 @@ interface ApiResponse {
     review: string;
     value: number;
   }>;
+  mapUrl: string;
 }
 
 export const EstimateForm: React.FC = () => {
@@ -61,6 +62,7 @@ export const EstimateForm: React.FC = () => {
         setShowModal('flex');
         setMessage({ text: 'Rota calculada com sucesso!', type: 'success' });
         setFormData({ id: '', origin: '', destination: '' }); // Limpa os campos do formulário
+        localStorage.setItem('mapUrl', response.data.mapUrl);
       } else {
         setMessage({ text: 'Ocorreu um erro ao calcular a rota.', type: 'error' });
       }
@@ -77,7 +79,7 @@ export const EstimateForm: React.FC = () => {
       <div className={style.forms}>
         <h1>Planeje sua Viagem com Facilidade!</h1>
         <p>Preencha as informações abaixo para calcular a rota e estimar sua viagem.</p>
-
+        
         <div className={style.inputGroup}>
           <label htmlFor="id">ID:</label>
           <Input
@@ -133,6 +135,7 @@ export const EstimateForm: React.FC = () => {
         onClose={() => setShowModal('none')}
         drivers={drivers}
       />
+      
     </div>
   );
 };

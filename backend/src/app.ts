@@ -11,7 +11,10 @@ import { GOOGLE_MAPS_API_KEY } from './services/googleMaps';
 
 dotenv.config({ path: './.env' }); 
 
+
+
 const app: Application = express();
+
 
 app.use(express.json());
 

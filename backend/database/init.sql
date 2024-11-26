@@ -1,5 +1,6 @@
 
-CREATE DATABASE IF NOT EXISTS db_rides;
+CREATE DATABASE IF NOT EXISTS db_rides CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+
 USE db_rides;
 
 
@@ -60,3 +61,4 @@ CREATE TABLE IF NOT EXISTS rides (
 
 
 
+SELECT * FROM drivers;
