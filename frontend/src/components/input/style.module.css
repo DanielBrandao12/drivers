@@ -1,0 +1,18 @@
+.inputGlobal {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    border: 1px solid #14483F;
+    border-radius: 5px;
+    color: #08C88E;
+    background-color: #e8f1f0;
+    outline: none;
+    transition: border-color 0.3s ease-in-out;
+  }
+  
+  .inputGlobal:focus {
+    border-color: #08C88E;
+  }
+  

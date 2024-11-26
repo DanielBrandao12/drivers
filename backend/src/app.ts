@@ -7,7 +7,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import userRouter from './routes/userRoute'; 
 import rideRouter from './routes/ridesRoute';
-
+import { GOOGLE_MAPS_API_KEY } from './services/googleMaps';
 
 dotenv.config({ path: './.env' }); 
 
@@ -24,6 +24,10 @@ app.use(
   })
 );
 
+
+app.get('/api/maps-key', (req, res) => {
+  res.json({ apiKey: GOOGLE_MAPS_API_KEY });
+});
 app.use('/user', userRouter);
 app.use('/ride', rideRouter)
 

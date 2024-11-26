@@ -5,9 +5,11 @@ import { GOOGLE_MAPS_API_KEY } from '../services/googleMaps';
 import Driver from '../models/drivers';
 import Review from '../models/reviews';
 import Ride from '../models/rides';
-import { error } from 'console';
+import User from '../models/users';
+
 
 interface RideRequestBody {
+    id: number;
     origin: string; // Endereço ou coordenada de origem
     destination: string; // Endereço ou coordenada de destino
 }
@@ -30,6 +32,27 @@ const geocode = async (address: string) => {
         throw new Error('Erro ao obter coordenadas');
     }
 };
+
+export const getUser = async (id: number) => {
+    
+  
+    try {
+      const user = await User.findOne({
+        where: { id }, // Condição personalizada
+      });
+  
+      if (!user) {
+        console.error('Usuário não encontrado.')
+        return;
+      }
+  
+      return user
+    } catch (error) {
+      console.error('Erro ao buscar usuário:', error);
+      
+    }
+  };
+
 
 // Função para buscar motoristas com base na distância
 const getDriversByDistance = async (distance: number) => {
@@ -65,15 +88,25 @@ const getReviewsByDriverId = async (driverId: number) => {
 // Função principal para verificar a rota
 export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Response): Promise<void> => {
     try {
-        const { origin, destination } = req.body;
+        const { id, origin, destination } = req.body;
 
-        // Validação básica
+        // Verificar se o usuário existe
+        const user = await getUser(id);  // A função getUser agora retorna o usuário ou undefined
+
+        if (!user) {
+            res.status(404).json({ error: 'Usuário não encontrado.' });
+            return;
+        }
+
+        // Validação básica de origem e destino
         if (!origin || !destination) {
             res.status(400).json({ error: 'Origem e destino são obrigatórios.' });
             return;
         }
-        if(origin === destination){
-            res.status(400).json({error:'Origem e destino não podem ser iguais!'})
+
+        if (origin === destination) {
+            res.status(400).json({ error: 'Origem e destino não podem ser iguais!' });
+            return;
         }
 
         // Obter coordenadas de origem e destino
@@ -138,6 +171,7 @@ export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Re
         res.status(500).json({ error: 'Erro interno ao verificar a rota. Tente novamente mais tarde.' });
     }
 };
+
 
 
 export const confirmRide = async (req: Request, res: Response): Promise<void> => {

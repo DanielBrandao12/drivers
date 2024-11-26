@@ -1,0 +1,24 @@
+.containerHome{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  
+    color: #1E2044;
+  }
+  
+
+ 
+  
+
+  .containerMaps {
+    flex: 1;
+
+    background-color: #ffffff;
+    border-radius: 10px;
+    margin-left: 20px;
+
+    width: 50vw;
+    height: 100vh;
+    
+}
+

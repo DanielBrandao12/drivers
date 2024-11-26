@@ -1,0 +1,127 @@
+/* Container geral do modal */
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+   
+    z-index: 999;
+  }
+  
+  /* Modal principal */
+  .containerModal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+    margin-right: 25px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 3px 5px 0px rgba(30,32,68,1);
+    
+    padding: 20px;
+    max-height: 80%;
+    overflow-y: auto;
+  }
+  
+  /* Título do modal */
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1e2044;
+    margin-bottom: 20px;
+  }
+  
+  /* Card do motorista */
+  .driverCard {
+    display: flex;
+    flex-direction: column;
+    width: 90%;
+    border: 1px solid #08c88e;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Header do motorista */
+  .driverHeader {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .containerPicture {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 15px;
+  }
+  
+  .containerPicture span {
+    width: 50px;
+    height: 50px;
+    background-color: #08c88e;
+    border: 2px solid #1e2044;
+    border-radius: 50%;
+  }
+  
+  .driverInfo {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .driverName {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1e2044;
+  }
+  
+  .driverCar {
+    font-size: 14px;
+    color: #14483f;
+    margin-top: 5px;
+  }
+  
+  /* Informações adicionais */
+  .containerInfo {
+    margin-bottom: 20px;
+  }
+  
+  .sectionTitle {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1e2044;
+    margin-bottom: 5px;
+  }
+  
+  .containerInfo p {
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+  }
+  
+  /* Preço e botão de confirmação */
+  .containerPriceConfirm {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border: 1px solid #08c88e;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1e2044;
+  }
+  

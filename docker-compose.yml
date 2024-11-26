@@ -4,6 +4,12 @@ services:
     build: ./backend
     ports:
       - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=rootpassword
+      - DB_NAME=db_rides
+      - PORT=8080
     env_file:
       - .env  # Adiciona essa linha para que o Docker leia o .env da raiz
     depends_on:
