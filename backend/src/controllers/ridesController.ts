@@ -259,3 +259,52 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
 };
 
 
+//preciso consultar usuario
+//se for passado id do motorista consultar
+//um get para exibir todos os motoristas
+//buscar viagens se for selecionado motorista buscas viagens feita com ele
+//senao buscas viagens com todos os motoristas
+// Busca todos os motoristas
+export const getAll = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const drivers = await Driver.findAll(); // Busca todos os motoristas
+     res.status(200).json(drivers);
+  } catch (error) {
+    console.error('Erro ao buscar motoristas:', error);
+     res.status(500).json({
+      error_code: 'INTERNAL_SERVER_ERROR',
+      error_description: 'Ocorreu um erro ao buscar os motoristas.',
+    });
+  }
+};
+
+// Busca um motorista por ID
+export const getById = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+
+  if (!id ) {
+     res.status(400).json({
+      error_code: 'INVALID_ID',
+      error_description: 'O ID do motorista deve ser um número válido.',
+    });
+  }
+
+  try {
+    const driver = await Driver.findByPk(id); // Busca o motorista pelo ID
+
+    if (!driver) {
+       res.status(404).json({
+        error_code: 'DRIVER_NOT_FOUND',
+        error_description: 'Nenhum motorista encontrado com o ID fornecido.',
+      });
+    }
+
+     res.status(200).json(driver);
+  } catch (error) {
+    console.error('Erro ao buscar motorista:', error);
+     res.status(500).json({
+      error_code: 'INTERNAL_SERVER_ERROR',
+      error_description: 'Ocorreu um erro ao buscar o motorista.',
+    });
+  }
+};
