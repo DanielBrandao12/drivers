@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS rides (
   distance DECIMAL(10,2) NOT NULL,
   duration VARCHAR(255) NOT NULL,
   user_id INT NOT NULL,
-  driver_id INT NOT NULL,
-  r_value DECIMAL(10,2) NOT NULL,
+  driver_id INT ,
+  r_value DECIMAL(10,2) ,
   r_date DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (driver_id) REFERENCES drivers(id)

@@ -24,11 +24,7 @@ export const Home: React.FC = () => {
 
   return (
     <div className={style.containerHome}>
-      <div className={style.containerMaps}>
-     
-            <Map /> 
-        
-      </div>
+
       <EstimateForm />
     </div>
   );

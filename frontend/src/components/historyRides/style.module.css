@@ -1,0 +1,98 @@
+.containerRides{
+      position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(30, 32, 68, 0.096);
+    z-index: 999;
+}
+.containerRides h3{
+    font-size: 25px
+}
+
+.rides{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 35%;
+    background-color: #fff;
+    border-radius: 10px;    
+    box-shadow: 0px 3px 5px 0px rgba(30,32,68,1);
+    padding: 20px;
+    height: 80%;
+    overflow-y: auto;
+}
+
+.selectDriver{
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        font-size: 16px;
+        border: 1px solid #14483F;
+        border-radius: 5px;
+        color: #08C88E;
+        background-color: #e8f1f0;
+        outline: none;
+        transition: border-color 0.3s ease-in-out;
+      }
+      
+      .selectDriver:focus {
+        border-color: #08C88E;
+      }
+      
+
+
+  .filterSection {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .myRides {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Espaçamento entre os cards */
+    padding: 16px;
+    background-color: #f9f9f9; /* Fundo claro para destacar o conteúdo */
+    border-radius: 8px;
+    width: 100%;
+    
+    overflow: auto;
+  }
+  
+  .cardRide {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Espaçamento entre as seções */
+  }
+  
+  .cardRide div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0; /* Linha separadora */
+    padding-bottom: 8px;
+  }
+  
+  .cardRide div:last-child {
+    border-bottom: none; /* Remove a linha do último item */
+  }
+  
+  .cardRide span {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333333; /* Texto escuro */
+  }
+  
+  .cardRide span:first-child {
+    font-weight: 600; /* Destaque para o primeiro span de cada linha */
+  }

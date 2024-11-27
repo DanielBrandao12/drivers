@@ -85,6 +85,8 @@ const getReviewsByDriverId = async (driverId: number) => {
     }
 };
 
+
+
 // Função principal para verificar a rota
 export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Response): Promise<void> => {
     try {
@@ -160,7 +162,10 @@ export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Re
                 distance,
                 duration,
                 user_id: id,
+                r_date: new Date()
             });
+
+         
 
             // Gerar o URL do mapa estático
             const staticMapUrl = `https://maps.googleapis.com/maps/api/staticmap?size=600x400&markers=color:red%7Clabel:S%7C${originCoords.latitude},${originCoords.longitude}&markers=color:blue%7Clabel:D%7C${destinationCoords.latitude},${destinationCoords.longitude}&path=color:0x0000ff|weight:3|${originCoords.latitude},${originCoords.longitude}|${destinationCoords.latitude},${destinationCoords.longitude}&key=${GOOGLE_MAPS_API_KEY}`;
@@ -189,33 +194,68 @@ export const verifyRoute = async (req: Request<{}, {}, RideRequestBody>, res: Re
 
 
 export const confirmRide = async (req: Request, res: Response): Promise<void> => {
-    try {
-        // Extrair os campos do corpo da requisição
-        const { id,driver_id, value } = req.body;
+  try {
+    // Extrair os campos do corpo da requisição
+    const { id, driver_id, value } = req.body;
 
-        // Validação básica dos campos obrigatórios
-        if ( !driver_id || !value) {
-            res.status(400).json({ 
-                error: 'Todos os campos obrigatórios devem ser fornecidos: user_id, origin, destination, distance, duration, driver_id, value.' 
-            });
-            return;
-        }
-
-        // Criação do registro da corrida
-        await Ride.update({
-       
-            driver_id,
-            r_value:value,
-            r_date:new Date()
-            
-        },{where:{id}});
-
-        // Retornar a confirmação da criação com os dados da corrida
-        res.status(200).json({
-            message: 'Corrida confirmada com sucesso.'
-        });
-    } catch (error) {
-        console.error('Erro ao confirmar a corrida:', error.message || error);
-        res.status(500).json({ error: 'Erro interno ao confirmar a corrida. Tente novamente mais tarde.' });
+    // Validação básica dos campos obrigatórios
+    if (!id || !driver_id || !value) {
+      res.status(400).json({
+        error_code: "INVALID_DATA",
+        error_description: "Todos os campos obrigatórios devem ser fornecidos: id, driver_id, value."
+      });
+      return;
     }
+
+    // Verificar se o motorista existe
+    const driver = await Driver.findOne({ where: { id: driver_id } });
+    if (!driver) {
+      res.status(404).json({
+        error_code: "DRIVER_NOT_FOUND",
+        error_description: "Motorista não encontrado."
+      });
+      return;
+    }
+
+    // Validação adicional para quilometragem (exemplo fictício)
+    if (value <= 0) {
+      res.status(406).json({
+        error_code: "INVALID_DISTANCE",
+        error_description: "A quilometragem ou valor da corrida fornecido é inválido."
+      });
+      return;
+    }
+
+    // Atualizar o registro da corrida
+    const rideUpdateResult = await Ride.update(
+      {
+        driver_id,
+        r_value: value,
+        
+      },
+      { where: { id } }
+    );
+
+    if (rideUpdateResult[0] === 0) {
+      res.status(404).json({
+        error_code: "INVALID_DATA",
+        error_description: "Corrida não encontrada para o ID fornecido."
+      });
+      return;
+    }
+
+    // Retornar a confirmação da atualização com os dados da corrida
+    res.status(200).json({
+      success: true,
+      message: "Corrida confirmada com sucesso."
+    });
+  } catch (error) {
+    console.error("Erro ao confirmar a corrida:", error.message || error);
+    res.status(500).json({
+      error_code: "INTERNAL_ERROR",
+      error_description: "Erro interno ao confirmar a corrida. Tente novamente mais tarde."
+    });
+  }
 };
+
+

@@ -4,6 +4,7 @@ import { Input } from '../../components/input';
 import { Button } from '../../components/button';
 import { ModalDrives } from '../../components/modaldrivers';
 import style from './style.module.css';
+import { HistoryRides } from '../../components/historyRides';
 
 interface ApiResponse {
   origin: {
@@ -25,6 +26,8 @@ interface ApiResponse {
     value: number;
   }>;
   mapUrl: string;
+  rideId: number;
+  
 }
 
 export const EstimateForm: React.FC = () => {
@@ -36,8 +39,8 @@ export const EstimateForm: React.FC = () => {
   }); // Mensagens de feedback
   const [drivers, setDrivers] = useState<any[]>([]);
   const [showModal, setShowModal] = useState<string>('');
-  
-
+  const [showHistory, setShowHisroty] = useState<string>('');
+  const [rideId, setRideId]= useState<number>(0)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -60,10 +63,12 @@ export const EstimateForm: React.FC = () => {
       if (response.status === 200 && response.data) {
         console.log('Resposta da API:', response.data);
         setDrivers(response.data.options); // Armazena os motoristas
+        setRideId(response.data.rideId)
         setShowModal('flex');
+        localStorage.setItem('mapUrl', response.data.mapUrl);
         setMessage({ text: 'Rota calculada com sucesso!', type: 'success' });
         setFormData({ id: '', origin: '', destination: '' }); // Limpa os campos do formulário
-         localStorage.setItem('mapUrl', response.data.mapUrl);
+        
       } else {
         setMessage({ text: 'Ocorreu um erro ao calcular a rota.', type: 'error' });
       }
@@ -129,13 +134,23 @@ export const EstimateForm: React.FC = () => {
           text={loading ? 'Calculando...' : 'Calcular viagem'}
           onClick={handleSubmit}
           disabled={loading}
+   
         />
       </div>
       <ModalDrives
-        isOpen={showModal}
-        onClose={() => setShowModal('none')}
-        drivers={drivers}
-      />
+  isOpen={showModal}
+  onClose={() => setShowModal('none')}
+  drivers={drivers}
+  rideId={rideId}
+  onRideConfirmed={() => {
+    setShowModal('none'); // Fecha o modal de motoristas
+    setShowHisroty('flex'); // Abre o modal de histórico
+  }}
+/>
+<HistoryRides
+  isOpen={showHistory}
+  onClose={() => setShowHisroty('none')}
+/>
     </div>
   );
 };

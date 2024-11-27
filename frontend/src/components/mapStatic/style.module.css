@@ -3,7 +3,7 @@
     border-radius: 8px;
     padding: 16px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+    width: 39vw;
     margin: 0 auto; /* Centraliza a div */
     background-color: #f9f9f9;
   }
