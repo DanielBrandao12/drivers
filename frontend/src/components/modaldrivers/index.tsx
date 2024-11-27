@@ -36,7 +36,7 @@ export const ModalDrives: React.FC<ModalDrivesProps> = ({
 }) => {
   const [confirmRideVisible, setConfirmRideVisible] = useState<boolean>(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
-  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
+  //const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
   const [isPopupOpenSucess, setPopupOpenSucess] = useState<boolean>(false);
   const [confirmationMessage, setConfirmationMessage] = useState<string>('');
 
@@ -71,7 +71,7 @@ export const ModalDrives: React.FC<ModalDrivesProps> = ({
       console.error('Erro ao confirmar a viagem:', error);
       setConfirmationMessage('Erro ao confirmar a viagem. Tente novamente mais tarde.');
       setConfirmRideVisible(false);
-      setPopupOpen(true); // Abre o popup de erro
+      setPopupOpenSucess(true); // Abre o popup de erro
     }
   };
 
@@ -131,7 +131,7 @@ export const ModalDrives: React.FC<ModalDrivesProps> = ({
         {isPopupOpenSucess && (
           <Popup
             openPopup={true}
-            onClose={() => setPopupOpen(false)}
+            onClose={() => setPopupOpenSucess(false)}
             autoCloseTime={3000} // Fecha automaticamente após 3 segundos
           >
             <h3>{confirmationMessage}</h3>

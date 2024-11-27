@@ -69,30 +69,31 @@
     background-color: #ffffff;
     border-radius: 8px;
     padding: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
     display: flex;
     flex-direction: column;
-    gap: 12px; /* Espaçamento entre as seções */
+    gap: 12px; 
+    height: 60vh !important;
   }
   
   .cardRide div {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e0e0e0; /* Linha separadora */
+    border-bottom: 1px solid #e0e0e0; 
     padding-bottom: 8px;
   }
   
   .cardRide div:last-child {
-    border-bottom: none; /* Remove a linha do último item */
+    border-bottom: none; 
   }
   
   .cardRide span {
     font-size: 14px;
     font-weight: 500;
-    color: #333333; /* Texto escuro */
+    color: #333333;
   }
   
   .cardRide span:first-child {
-    font-weight: 600; /* Destaque para o primeiro span de cada linha */
+    font-weight: 600; 
   }

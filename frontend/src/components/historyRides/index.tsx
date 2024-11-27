@@ -21,11 +21,11 @@ interface Driver {
 }
 
 interface HistoryRidesProps {
-  isOpen: string; // Alterado para boolean para facilitar o controle
-  onClose: () => void;
+  isOpen: string; // Alterado para boolean
+  onClose: () => void; // Função para fechar o modal
 }
 
-export const HistoryRides: React.FC<HistoryRidesProps> =({ isOpen, onClose }) => {
+export const HistoryRides: React.FC<HistoryRidesProps> = ({ isOpen, onClose }) => {
   const [userId, setUserId] = useState<string>(''); // ID do usuário
   const [driverId, setDriverId] = useState<string>(''); // ID do motorista (opcional)
   const [rides, setRides] = useState<Ride[]>([]); // Lista de viagens
@@ -73,6 +73,8 @@ export const HistoryRides: React.FC<HistoryRidesProps> =({ isOpen, onClose }) =>
         if (response.data.rides.length === 0) {
           setErrorMessage('Nenhum registro encontrado.');
         }
+      } else if (response.status === 404) {
+        setErrorMessage(response.data.message);
       }
     } catch (error: any) {
       console.error('Erro ao buscar viagens:', error);
@@ -80,7 +82,7 @@ export const HistoryRides: React.FC<HistoryRidesProps> =({ isOpen, onClose }) =>
         error.response?.data?.error_description ||
           'Erro ao buscar as viagens. Tente novamente mais tarde.'
       );
-      setRides([])
+      setRides([]);
     } finally {
       setLoading(false);
     }
@@ -93,7 +95,10 @@ export const HistoryRides: React.FC<HistoryRidesProps> =({ isOpen, onClose }) =>
   };
 
   return (
-    <div className={style.containerRides} style={{ display: isOpen ? 'flex' : 'none' }}>
+    <div
+      className={style.containerRides}
+      style={{ display: isOpen ? 'flex' : 'none' }} // Sincroniza com isOpen
+    >
       <div className={style.rides}>
         <h3>Histórico de Viagens</h3>
 
@@ -132,23 +137,29 @@ export const HistoryRides: React.FC<HistoryRidesProps> =({ isOpen, onClose }) =>
         </div>
 
         <div className={style.myRides}>
-          {rides.map((ride) => (
-            <div key={ride.id} className={style.cardRide}>
-              <div>
-                <span>Motorista: {ride.driver_name}</span>
-                <span>Data e Hora: {new Date(ride.r_date).toLocaleString()}</span>
+          {rides.map((ride) => {
+            // Extrair a duração em segundos da string e converter para minutos
+            const seconds = parseInt(ride.duration.replace(/\D/g, ''), 10); // Remove 's' e converte para número
+            const durationInMinutes = Math.floor(seconds / 60); // Converte para minutos e arredonda
+
+            return (
+              <div key={ride.id} className={style.cardRide}>
+                <div>
+                  <span>Motorista: {ride.driver_name}</span>
+                  <span>Data e Hora: {new Date(ride.r_date).toLocaleString()}</span>
+                </div>
+                <div>
+                  <span>Origem: {ride.origin}</span>
+                  <span>Destino: {ride.destination}</span>
+                </div>
+                <div>
+                  <span>Distância: {(ride.distance / 100).toFixed(2)} km</span>
+                  <span>Duração: {durationInMinutes} min</span>
+                  <span>Valor: R${ride.r_value}</span>
+                </div>
               </div>
-              <div>
-                <span>Origem: {ride.origin}</span>
-                <span>Destino: {ride.destination}</span>
-              </div>
-              <div>
-                <span>Distância: {(ride.distance / 100).toFixed(2)} km</span>
-                <span>Duração: {ride.duration}</span>
-                <span>Valor: R${ride.r_value}</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <Button text="Fechar" onClick={onClose} />
