@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import api from '../../services/api';
 import style from './style.module.css';
 import { Button } from '../button';
 import { MapEstatic } from '../mapStatic';
-
+import { Popup } from '../popup'; // Certifique-se de importar o Popup corretamente
 
 interface Driver {
   id: number;
@@ -26,27 +26,32 @@ interface ModalDrivesProps {
   onRideConfirmed: () => void;
 }
 
-export const ModalDrives: React.FC<ModalDrivesProps> = ({ isOpen, onClose, drivers, rideId, mapUrl, onRideConfirmed  }) => {
+export const ModalDrives: React.FC<ModalDrivesProps> = ({
+  isOpen,
+  onClose,
+  drivers,
+  rideId,
+  mapUrl,
+  onRideConfirmed,
+}) => {
   const [confirmRideVisible, setConfirmRideVisible] = useState<boolean>(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
-
+  const [isPopupOpen, setPopupOpen] = useState<boolean>(false);
+  const [isPopupOpenSucess, setPopupOpenSucess] = useState<boolean>(false);
+  const [confirmationMessage, setConfirmationMessage] = useState<string>('');
 
   if (!isOpen) return null;
 
   const showConfirmRide = (driver: Driver) => {
-  
     setSelectedDriver(driver);
     setConfirmRideVisible(true);
-   
   };
 
   const handleConfirmRide = async () => {
- 
     if (!selectedDriver) {
       console.log('Nenhum motorista selecionado');
       return;
     }
-    console.log(rideId)
 
     try {
       const response = await api.patch('/ride/confirm', {
@@ -56,15 +61,17 @@ export const ModalDrives: React.FC<ModalDrivesProps> = ({ isOpen, onClose, drive
       });
 
       if (response.status === 200) {
-        localStorage.removeItem('mapUrl');
-        alert('Viagem confirmada com sucesso!');
+        setConfirmationMessage(`Viagem confirmada com ${selectedDriver.name}!`);
         setConfirmRideVisible(false);
-        onClose(); // Fecha o modal
+        setPopupOpenSucess(true); // Abre o popup de sucesso
+        onClose();
         onRideConfirmed();
       }
     } catch (error) {
       console.error('Erro ao confirmar a viagem:', error);
-      alert('Erro ao confirmar a viagem. Tente novamente mais tarde.');
+      setConfirmationMessage('Erro ao confirmar a viagem. Tente novamente mais tarde.');
+      setConfirmRideVisible(false);
+      setPopupOpen(true); // Abre o popup de erro
     }
   };
 
@@ -94,31 +101,43 @@ export const ModalDrives: React.FC<ModalDrivesProps> = ({ isOpen, onClose, drive
 
             <div className={style.containerPriceConfirm}>
               <span className={style.price}>R${driver.value.toFixed(2)}</span>
-              <Button text="Escolher"  onClick={() => showConfirmRide(driver)}  />
+              <Button text="Escolher" onClick={() => showConfirmRide(driver)} />
             </div>
           </div>
         ))}
 
-        <Button text="Fechar"  onClick={onClose}  />
-        {/*criar componente para usar o popup */}
+     
+
         {confirmRideVisible && selectedDriver && (
-          <div className={style.popupOverlay}>
-            <div className={style.popupContent}>
-              <h3>Confirmação</h3>
-              <p>Deseja confirmar a viagem com {selectedDriver.name}?</p>
-              <div className={style.popupActions}>
-                <button className={style.cancelButton} onClick={() => setConfirmRideVisible(false)}>
-                  Cancelar
-                </button>
-                <button className={style.confirmButton} onClick={handleConfirmRide}>
-                  Confirmar
-                </button>
-              </div>
+          <Popup
+            openPopup={true}
+            onClose={() => setConfirmRideVisible(false)}
+            autoCloseTime={5000} // Fecha automaticamente após 5 segundos
+          >
+            <h3>Confirmação</h3>
+            <p>Deseja confirmar a viagem com {selectedDriver.name}?</p>
+            <div className={style.popupActions}>
+              <button className={style.cancelButton} onClick={() => setConfirmRideVisible(false)}>
+                Cancelar
+              </button>
+              <button className={style.confirmButton} onClick={handleConfirmRide}>
+                Confirmar
+              </button>
             </div>
-          </div>
+          </Popup>
+        )}
+
+        {/* Popup de Sucesso ou Erro */}
+        {isPopupOpenSucess && (
+          <Popup
+            openPopup={true}
+            onClose={() => setPopupOpen(false)}
+            autoCloseTime={3000} // Fecha automaticamente após 3 segundos
+          >
+            <h3>{confirmationMessage}</h3>
+          </Popup>
         )}
       </div>
     </div>
   );
 };
-

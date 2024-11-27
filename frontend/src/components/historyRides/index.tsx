@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../../services/api';
 import style from './style.module.css';
 import { Input } from '../input';
@@ -6,40 +6,65 @@ import { Button } from '../button';
 
 interface Ride {
   id: number;
-  date: string;
+  r_date: string;
   origin: string;
   destination: string;
   distance: number;
   duration: string;
-  driver: {
-    id: number;
-    name: string;
-  };
-  value: number;
+  driver_name: string;
+  r_value: number;
+}
+
+interface Driver {
+  id: number;
+  m_name: string;
 }
 
 interface HistoryRidesProps {
-  isOpen: string; // Altere para boolean
+  isOpen: string; // Alterado para boolean para facilitar o controle
   onClose: () => void;
 }
 
-export const HistoryRides: React.FC<HistoryRidesProps> = ({ isOpen, onClose }) => {
-  const [customerId, setCustomerId] = useState<string>(''); // ID do usuário
+export const HistoryRides: React.FC<HistoryRidesProps> =({ isOpen, onClose }) => {
+  const [userId, setUserId] = useState<string>(''); // ID do usuário
   const [driverId, setDriverId] = useState<string>(''); // ID do motorista (opcional)
   const [rides, setRides] = useState<Ride[]>([]); // Lista de viagens
+  const [drivers, setDrivers] = useState<Driver[]>([]); // Lista de motoristas
   const [errorMessage, setErrorMessage] = useState<string>(''); // Mensagem de erro
   const [loading, setLoading] = useState<boolean>(false); // Controle de carregamento
 
+  // Função para buscar motoristas
+  const fetchDrivers = useCallback(async () => {
+    try {
+      const response = await api.get<Driver[]>('/ride/alldrivers');
+      if (response.status === 200) {
+        setDrivers(response.data);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar motoristas:', error);
+      setErrorMessage('Erro ao carregar motoristas. Tente novamente.');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchDrivers();
+    }
+  }, [isOpen, fetchDrivers]);
+
+  // Função para buscar viagens
   const handleSearch = async () => {
-    if (!customerId) {
+    if (!userId) {
       setErrorMessage('Por favor, insira o ID do cliente.');
       return;
     }
 
     setLoading(true);
     setErrorMessage(''); // Limpa mensagens de erro anteriores
+
     try {
-      const response = await api.get(`/ride/${customerId}`, {
+      // Se driverId estiver vazio, retorna todas as viagens. Caso contrário, filtra pelas viagens do motorista selecionado.
+      const response = await api.get(`/ride/${userId}`, {
         params: driverId ? { driver_id: driverId } : {},
       });
 
@@ -51,21 +76,20 @@ export const HistoryRides: React.FC<HistoryRidesProps> = ({ isOpen, onClose }) =
       }
     } catch (error: any) {
       console.error('Erro ao buscar viagens:', error);
-      if (error.response) {
-        const { error_code, error_description } = error.response.data;
-        if (error_code === 'INVALID_DRIVER') {
-          setErrorMessage('Motorista inválido.');
-        } else if (error_code === 'NO_RIDES_FOUND') {
-          setErrorMessage('Nenhum registro encontrado.');
-        } else {
-          setErrorMessage('Erro ao buscar as viagens. Tente novamente mais tarde.');
-        }
-      } else {
-        setErrorMessage('Erro ao conectar ao servidor.');
-      }
+      setErrorMessage(
+        error.response?.data?.error_description ||
+          'Erro ao buscar as viagens. Tente novamente mais tarde.'
+      );
+      setRides([])
     } finally {
       setLoading(false);
     }
+  };
+
+  // Função para lidar com a mudança do filtro de motoristas
+  const handleDriverSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setDriverId(value); // Quando selecionar "Mostrar todos", o driverId ficará vazio, e todas as corridas serão mostradas
   };
 
   return (
@@ -75,10 +99,10 @@ export const HistoryRides: React.FC<HistoryRidesProps> = ({ isOpen, onClose }) =
 
         <div className={style.filterSection}>
           <Input
-            id="customer_id"
-            name="customer_id"
-            value={customerId}
-            onChange={(e) => setCustomerId(e.target.value)}
+            id="user_id"
+            name="user_id"
+            value={userId}
+            onChange={(e) => setUserId(e.target.value)}
             placeholder="Digite seu ID"
             required
           />
@@ -86,12 +110,14 @@ export const HistoryRides: React.FC<HistoryRidesProps> = ({ isOpen, onClose }) =
           <select
             className={style.selectDriver}
             value={driverId}
-            onChange={(e) => setDriverId(e.target.value)}
+            onChange={handleDriverSelectChange}
           >
             <option value="">Mostrar todos</option>
-            {/* Substitua por motoristas reais da API */}
-            <option value="1">Motorista João</option>
-            <option value="2">Motorista Maria</option>
+            {drivers.map((driver) => (
+              <option key={driver.id} value={driver.id}>
+                {driver.m_name}
+              </option>
+            ))}
           </select>
 
           <Button
@@ -109,21 +135,22 @@ export const HistoryRides: React.FC<HistoryRidesProps> = ({ isOpen, onClose }) =
           {rides.map((ride) => (
             <div key={ride.id} className={style.cardRide}>
               <div>
-                <span>Motorista: {ride.driver.name}</span>
-                <span>Data e Hora: {new Date(ride.date).toLocaleString()}</span>
+                <span>Motorista: {ride.driver_name}</span>
+                <span>Data e Hora: {new Date(ride.r_date).toLocaleString()}</span>
               </div>
               <div>
                 <span>Origem: {ride.origin}</span>
                 <span>Destino: {ride.destination}</span>
               </div>
               <div>
-                <span>Distância: {ride.distance} km</span>
+                <span>Distância: {(ride.distance / 100).toFixed(2)} km</span>
                 <span>Duração: {ride.duration}</span>
-                <span>Valor: R${ride.value.toFixed(2)}</span>
+                <span>Valor: R${ride.r_value}</span>
               </div>
             </div>
           ))}
         </div>
+
         <Button text="Fechar" onClick={onClose} />
       </div>
     </div>

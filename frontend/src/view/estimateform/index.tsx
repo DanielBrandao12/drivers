@@ -7,40 +7,41 @@ import style from './style.module.css';
 import { HistoryRides } from '../../components/historyRides';
 
 interface ApiResponse {
-  origin: {
-    latitude: number;
-    longitude: number;
-  };
-  destination: {
-    latitude: number;
-    longitude: number;
-  };
-  distance: number;
-  duration: string;
-  options: Array<{
-    id: number;
-    name: string;
-    vehicle: string;
-    description: string;
-    review: string;
-    value: number;
-  }>;
-  mapUrl: string;
-  rideId: number;
+      origin: {
+        latitude: number;
+        longitude: number;
+      };
+      destination: {
+        latitude: number;
+        longitude: number;
+      };
+      distance: number;
+      duration: string;
+      options: Array<{
+        id: number;
+        name: string;
+        vehicle: string;
+        description: string;
+        review: string;
+        value: number;
+      }>;
+      mapUrl: string;
+      rideId: number;
+      error: string;
 }
 
 export const EstimateForm: React.FC = () => {
-  const [formData, setFormData] = useState({ id: '', origin: '', destination: '' });
-  const [loading, setLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | '' }>({
-    text: '',
-    type: '',
-  });
-  const [drivers, setDrivers] = useState<any[]>([]);
-  const [showModal, setShowModal] = useState<string>('');
-  const [showHistory, setShowHistory] = useState<string>('');
-  const [rideId, setRideId] = useState<number>(0);
-  const [mapUrlState, setMapUrlState] = useState<string>(''); // Estado para o mapa atualizado
+    const [formData, setFormData] = useState({ id: '', origin: '', destination: '' });
+    const [loading, setLoading] = useState<boolean>(false);
+    const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | '' }>({
+      text: '',
+      type: '',
+    });
+    const [drivers, setDrivers] = useState<any[]>([]);
+    const [showModal, setShowModal] = useState<string>('');
+    const [showHistory, setShowHistory] = useState<string>('');
+    const [rideId, setRideId] = useState<number>(0);
+    const [mapUrlState, setMapUrlState] = useState<string>('');
 
   // Limpar localStorage ao iniciar o componente
   useEffect(() => {
@@ -60,6 +61,11 @@ export const EstimateForm: React.FC = () => {
       return;
     }
 
+    if(origin === destination){
+      setMessage({text: 'Origem e destino não podem ser iguais', type:'error'})
+        return
+      
+    }
     setLoading(true);
     setMessage({ text: '', type: '' });
 
@@ -69,8 +75,13 @@ export const EstimateForm: React.FC = () => {
       localStorage.removeItem('mapUrl');
 
       const response = await api.post<ApiResponse>('/ride/estimate', { id, origin, destination });
+      if(response.status === 404){
 
-      if (response.status === 200 && response.data) {
+        setMessage({text: response.data.error, type:'error'})
+        return
+
+      } else if (response.status === 200 && response.data) {
+
         console.log('Resposta da API:', response.data);
 
         setDrivers(response.data.options); // Atualiza os motoristas
@@ -79,14 +90,22 @@ export const EstimateForm: React.FC = () => {
         setShowModal('flex');
         setMessage({ text: 'Rota calculada com sucesso!', type: 'success' });
         setFormData({ id: '', origin: '', destination: '' });
-      } else {
+
+      } else if(response.status === 500){
+
         setMessage({ text: 'Ocorreu um erro ao calcular a rota.', type: 'error' });
+        return
+
       }
     } catch (error) {
+
       console.error('Erro ao enviar dados:', error);
       setMessage({ text: 'Erro ao conectar ao servidor.', type: 'error' });
+
     } finally {
+
       setLoading(false);
+      
     }
   };
 
@@ -161,7 +180,7 @@ export const EstimateForm: React.FC = () => {
       />
       <HistoryRides isOpen={showHistory} onClose={() => setShowHistory('none')} />
 
-   
+
     </div>
   );
 };

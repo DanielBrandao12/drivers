@@ -227,6 +227,7 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
     }
 
     // Atualizar o registro da corrida
+    console
     const rideUpdateResult = await Ride.update(
       {
         driver_id,
@@ -265,7 +266,7 @@ export const confirmRide = async (req: Request, res: Response): Promise<void> =>
 //buscar viagens se for selecionado motorista buscas viagens feita com ele
 //senao buscas viagens com todos os motoristas
 // Busca todos os motoristas
-export const getAll = async (req: Request, res: Response): Promise<void> => {
+export const getAllDrivers = async (req: Request, res: Response): Promise<void> => {
   try {
     const drivers = await Driver.findAll(); // Busca todos os motoristas
      res.status(200).json(drivers);
@@ -275,6 +276,68 @@ export const getAll = async (req: Request, res: Response): Promise<void> => {
       error_code: 'INTERNAL_SERVER_ERROR',
       error_description: 'Ocorreu um erro ao buscar os motoristas.',
     });
+  }
+};
+
+export const getByIdDrivers = async (id:number) => {
+  try {
+    const driver = await Driver.findByPk(id); // Busca todos os motoristas
+     return driver
+  } catch (error) {
+    console.error('Erro ao buscar motoristas:', error);
+     
+  }
+};
+
+
+
+export const getRides = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Parâmetro da rota (ID do usuário)
+    const userId = req.params.id;
+
+    // Query string (opcional) para filtrar pelo motorista
+    const driverId = req.query.driver_id as string | undefined;
+
+    console.log(`Usuário ID: ${userId}`);
+    if (driverId) {
+      console.log(`Filtrando pelo Motorista ID: ${driverId}`);
+    }
+
+    // Busca todas as viagens associadas ao usuário
+    const rides = await Ride.findAll({ where: { user_id: userId } });
+
+    // Se não houver nenhuma viagem para o usuário
+    if (rides.length === 0) {
+       res.status(404).json({ message: 'Nenhuma viagem encontrada para esse usuário.' });
+    }
+
+    // Se um driverId foi fornecido, filtra as viagens pelo motorista
+    let filteredRides = driverId
+      ? rides.filter((ride) => ride.driver_id === parseInt(driverId))
+      : rides;
+
+    // Se um driverId foi fornecido e não houver corridas para esse motorista
+    if (driverId && filteredRides.length === 0) {
+       res.status(404).json({ message: `Nenhuma viagem encontrada para o motorista ID: ${driverId}.` });
+    }
+
+    // Adiciona o nome do motorista às viagens
+    const ridesWithDriverNames = await Promise.all(
+      filteredRides.map(async (ride) => {
+        const driver = await getByIdDrivers(ride.driver_id);
+        return {
+          ...ride.toJSON(),
+          driver_name: driver ? driver.m_name : 'Motorista não encontrado',
+        };
+      })
+    );
+
+    // Retorna as viagens com o nome do motorista
+    res.status(200).json({ rides: ridesWithDriverNames });
+  } catch (error) {
+    console.error('Erro ao buscar viagens:', error);
+    res.status(500).json({ message: 'Erro interno do servidor.' });
   }
 };
 
