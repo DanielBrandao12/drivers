@@ -5,7 +5,7 @@ import { Button } from '../../components/button';
 import style from './style.module.css';
 import { EstimateForm } from '../estimateform';
 
-import { Map } from '../../components/maps';
+
 
 
 export const Home: React.FC = () => {

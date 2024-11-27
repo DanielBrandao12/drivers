@@ -7,7 +7,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import userRouter from './routes/userRoute'; 
 import rideRouter from './routes/ridesRoute';
-import driverRuter from './routes/driverRoute'
+
 
 dotenv.config({ path: './.env' }); 
 

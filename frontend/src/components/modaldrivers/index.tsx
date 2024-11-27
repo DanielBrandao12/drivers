@@ -22,21 +22,14 @@ interface ModalDrivesProps {
   onClose: () => void;
   drivers: Driver[];
   rideId: number;
+  mapUrl: string;
   onRideConfirmed: () => void;
 }
 
-export const ModalDrives: React.FC<ModalDrivesProps> = ({ isOpen, onClose, drivers, rideId, onRideConfirmed  }) => {
+export const ModalDrives: React.FC<ModalDrivesProps> = ({ isOpen, onClose, drivers, rideId, mapUrl, onRideConfirmed  }) => {
   const [confirmRideVisible, setConfirmRideVisible] = useState<boolean>(false);
   const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
-  const [mapUrl, setMapUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Recupera a URL do mapa armazenada no localStorage
-    const storedMapUrl = localStorage.getItem('mapUrl');
-    if (storedMapUrl) {
-      setMapUrl(storedMapUrl);
-    }
-  }, []);
 
   if (!isOpen) return null;
 

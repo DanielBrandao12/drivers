@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../../services/api';
 import { Input } from '../../components/input';
 import { Button } from '../../components/button';
@@ -18,7 +18,7 @@ interface ApiResponse {
   distance: number;
   duration: string;
   options: Array<{
-    id: number
+    id: number;
     name: string;
     vehicle: string;
     description: string;
@@ -27,20 +27,26 @@ interface ApiResponse {
   }>;
   mapUrl: string;
   rideId: number;
-  
 }
 
 export const EstimateForm: React.FC = () => {
-  const [formData, setFormData] = useState({ id: '', origin: '', destination: '' }); // Estado para os dados do formulário
-  const [loading, setLoading] = useState<boolean>(false); // Estado para controle de loading
+  const [formData, setFormData] = useState({ id: '', origin: '', destination: '' });
+  const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | '' }>({
     text: '',
     type: '',
-  }); // Mensagens de feedback
+  });
   const [drivers, setDrivers] = useState<any[]>([]);
   const [showModal, setShowModal] = useState<string>('');
-  const [showHistory, setShowHisroty] = useState<string>('');
-  const [rideId, setRideId]= useState<number>(0)
+  const [showHistory, setShowHistory] = useState<string>('');
+  const [rideId, setRideId] = useState<number>(0);
+  const [mapUrlState, setMapUrlState] = useState<string>(''); // Estado para o mapa atualizado
+
+  // Limpar localStorage ao iniciar o componente
+  useEffect(() => {
+    localStorage.removeItem('mapUrl');
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -55,20 +61,24 @@ export const EstimateForm: React.FC = () => {
     }
 
     setLoading(true);
-    setMessage({ text: '', type: '' }); // Limpa mensagens anteriores
+    setMessage({ text: '', type: '' });
 
     try {
+      // Limpa o mapa antes de fazer a requisição
+      setMapUrlState('');
+      localStorage.removeItem('mapUrl');
+
       const response = await api.post<ApiResponse>('/ride/estimate', { id, origin, destination });
 
       if (response.status === 200 && response.data) {
         console.log('Resposta da API:', response.data);
-        setDrivers(response.data.options); // Armazena os motoristas
-        setRideId(response.data.rideId)
+
+        setDrivers(response.data.options); // Atualiza os motoristas
+        setRideId(response.data.rideId);
+        setMapUrlState(response.data.mapUrl); // Atualiza o mapa
         setShowModal('flex');
-        localStorage.setItem('mapUrl', response.data.mapUrl);
         setMessage({ text: 'Rota calculada com sucesso!', type: 'success' });
-        setFormData({ id: '', origin: '', destination: '' }); // Limpa os campos do formulário
-        
+        setFormData({ id: '', origin: '', destination: '' });
       } else {
         setMessage({ text: 'Ocorreu um erro ao calcular a rota.', type: 'error' });
       }
@@ -85,7 +95,7 @@ export const EstimateForm: React.FC = () => {
       <div className={style.forms}>
         <h1>Planeje sua Viagem com Facilidade!</h1>
         <p>Preencha as informações abaixo para calcular a rota e estimar sua viagem.</p>
-        
+
         <div className={style.inputGroup}>
           <label htmlFor="id">ID:</label>
           <Input
@@ -129,28 +139,29 @@ export const EstimateForm: React.FC = () => {
             </p>
           )}
         </div>
-       
+
         <Button
           text={loading ? 'Calculando...' : 'Calcular viagem'}
           onClick={handleSubmit}
           disabled={loading}
-   
         />
       </div>
+
       <ModalDrives
-  isOpen={showModal}
-  onClose={() => setShowModal('none')}
-  drivers={drivers}
-  rideId={rideId}
-  onRideConfirmed={() => {
-    setShowModal('none'); // Fecha o modal de motoristas
-    setShowHisroty('flex'); // Abre o modal de histórico
-  }}
-/>
-<HistoryRides
-  isOpen={showHistory}
-  onClose={() => setShowHisroty('none')}
-/>
+        isOpen={showModal}
+        onClose={() => setShowModal('none')}
+        drivers={drivers}
+        rideId={rideId}
+        mapUrl={mapUrlState}
+        onRideConfirmed={() => {
+          setShowModal('none');
+          setShowHistory('flex');
+          setMapUrlState(''); // Limpa o mapa após confirmar a viagem
+        }}
+      />
+      <HistoryRides isOpen={showHistory} onClose={() => setShowHistory('none')} />
+
+   
     </div>
   );
 };
